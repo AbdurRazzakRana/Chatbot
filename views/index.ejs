@@ -1,0 +1,102 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="js/chatbot.js"></script>
+    <!-- <script type="text/javascript" src="MY LINK TO JQUERY"></script> -->
+    <!-- <link rel="stylesheet" href="css/chatbot.css" type="text/css"> -->
+
+</head>
+<body>
+<!-- <div class="topstrip" id="topstrip">Powered by <a href="https://www.miningbusinessdata.com" style="color:#d3d3d3"> MiningBusinessData</a>&nbsp;&nbsp;&nbsp;</div> -->
+<div class="topbar" id="chat-text">
+</div>
+<form>
+    <span style="width:100%;">
+        <input class="inputbox"
+               placeholder="Write something and press Enter..." id="message" name="date" value="">
+    </span>
+    <input name="submit" type="hidden" value="Submit">
+</form>
+
+
+<p id="demo"></p>
+<div class="result"></div>
+<script>
+	$(document).ready(function(){
+
+    $('form').on('submit', function (e) {
+        var query = $("#message").val();
+        //showUserText();
+        //e.preventDefault();
+        //document.getElementById("demo").innerHTML = 'Hi';
+        $.ajax({
+            type: 'GET',
+            url: 'process.php',
+            //data: { userID : userID }
+            data: {submit:true, message:query},
+            success: function (response) {
+                var obj = JSON.parse(response);
+                // document.getElementById("demo").innerHTML = obj;
+
+                $(".result").html(response);
+                // var answerdiv = jQuery('<div/>', {
+                //     html: obj.result.fulfillment.speech.linkify()+'&nbsp;',
+                //     'class': "rounded-div-bot",
+                //     tabindex:1
+                // });
+                // $("#chat-text").append(answerdiv);
+                // $(answerdiv).focus();
+
+                // $("#message").focus();
+            }
+        });
+
+
+        //document.getElementById("demo").innerHTML = 'Hi';
+
+
+    });
+
+});
+
+function showUserText(){
+    var div = jQuery('<div/>', {
+        text: $("#message").val(),
+        'class': "rounded-div",
+        tabindex:1
+    });
+    $("#chat-text" ).append(div);
+    $("#message").val('');
+}
+
+if(!String.linkify) {
+    String.prototype.linkify = function() {
+
+        // http://, https://, ftp://
+        var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+
+        // www. sans http:// or https://
+        var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+        // Email addresses
+        var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+        return this
+            .replace(urlPattern, '<a target="_blank" href="$&">$&</a>')
+            .replace(pseudoUrlPattern, '$1<a target="_blank" href="http://$2">$2</a>')
+            .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+    };
+}
+
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
