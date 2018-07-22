@@ -5,26 +5,57 @@ $(function () {
 
     $('form').on('submit', function (e) {
         var query = $("#message").val();
-        // showUserText();
+        showUserText();
         e.preventDefault();
 
+        var uri = "https://api.dialogflow.com/v1/query?v=20150910&lang=en&query=";
+        uri+=query;
+        uri+="&sessionId=123456789&timezone=Asis/Almaty";
         $.ajax({
             type: 'get',
-            url: 'process.php',
+            url: uri,
+            xhrFields: {
+                withCredentials: true
+            },
+            beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer 06739e5ce32444e4a8f636fed317eb2b');
+            },
+            
+            dataType: 'JSON',
             //data: { userID : userID }
             data: {submit:true, message:query},
             success: function (response) {
-                var obj = JSON.parse(response);
-                colsole.log(obj.id);
-                // var answerdiv = jQuery('<div/>', {
-                //     html: obj.result.fulfillment.speech.linkify()+'&nbsp;',
-                //     'class': "rounded-div-bot",
-                //     tabindex:1
-                // });
+                //console.log(response["result"]["resolvedQuery"]);
+                var obj = response["result"]["fulfillment"]["speech"];
+
+                var answerdiv = jQuery('<div/>', {
+                    html: obj.linkify()+'&nbsp;',
+                    'class': "rounded-div-bot",
+                    tabindex:1
+                });
                 $("#chat-text").append(answerdiv);
                 $(answerdiv).focus();
-
+ 
                 $("#message").focus();
+            },
+            error: function (jqXHR, exception) {
+                var msg = '';
+                if (jqXHR.status === 0) {
+                    msg = 'Not connect.\n Verify Network.';
+                } else if (jqXHR.status == 404) {
+                    msg = 'Requested page not found. [404]';
+                } else if (jqXHR.status == 500) {
+                    msg = 'Internal Server Error [500].';
+                } else if (exception === 'parsererror') {
+                    msg = 'Requested JSON parse failed.';
+                } else if (exception === 'timeout') {
+                    msg = 'Time out error.';
+                } else if (exception === 'abort') {
+                    msg = 'Ajax request aborted.';
+                } else {
+                    msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                }
+                console.log(msg);
             }
         });
 
